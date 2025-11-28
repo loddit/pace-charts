@@ -152,14 +152,14 @@ const CustomTooltip: React.FC<TooltipProps & { clickedPoint: ProcessedRecord | n
       
       return (
         <div className="bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-          <p className="font-bold">{data.displayDistance} - My PBs</p>
+          <p className="font-bold">{data.displayDistance} - My PB</p>
           <p>Time: {formatTime(data.time)}</p>
           <p className="font-semibold">Pace: {minutes}:{seconds.toString().padStart(2, '0')}/km</p>
           {malePercent && (
-            <p className="text-blue-600 mt-1">vs Men: {malePercent}%</p>
+            <p className="text-blue-600 mt-1">vs Men WR: {malePercent}%</p>
           )}
           {femalePercent && (
-            <p className="text-pink-600">vs Women: {femalePercent}%</p>
+            <p className="text-pink-600">vs Women WR: {femalePercent}%</p>
           )}
         </div>
       );
