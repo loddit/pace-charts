@@ -15,6 +15,10 @@ const AthleticsRecordsChart: React.FC = () => {
   const [myRecords, setMyRecords] = useState<MyRecords>({});
   const [editingRecords, setEditingRecords] = useState<MyRecords>({});
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [maleSpeedFactor, setMaleSpeedFactor] = useState<number>(100);
+  const [femaleSpeedFactor, setFemaleSpeedFactor] = useState<number>(100);
+  const [showMaleSlider, setShowMaleSlider] = useState<boolean>(false);
+  const [showFemaleSlider, setShowFemaleSlider] = useState<boolean>(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -91,8 +95,8 @@ const AthleticsRecordsChart: React.FC = () => {
   };
 
   // Process data
-  const maleData = processData(worldRecords.male, 'male');
-  const femaleData = processData(worldRecords.female, 'female');
+  const maleData = processData(worldRecords.male, 'male', maleSpeedFactor);
+  const femaleData = processData(worldRecords.female, 'female', femaleSpeedFactor);
   const myData = processMyRecords(myRecords);
 
   // Combine data based on toggles
@@ -157,11 +161,18 @@ const AthleticsRecordsChart: React.FC = () => {
             showMale={showMale}
             showFemale={showFemale}
             showMyPBs={showMyPBs}
-            isDark={isDark}
+            maleSpeedFactor={maleSpeedFactor}
+            femaleSpeedFactor={femaleSpeedFactor}
+            showMaleSlider={showMaleSlider}
+            showFemaleSlider={showFemaleSlider}
             onMaleToggle={setShowMale}
             onFemaleToggle={setShowFemale}
             onMyPBsToggle={handleMyPBsToggle}
             onUpdateMyPBs={openModal}
+            onMaleSpeedFactorChange={setMaleSpeedFactor}
+            onFemaleSpeedFactorChange={setFemaleSpeedFactor}
+            onToggleMaleSlider={() => setShowMaleSlider(!showMaleSlider)}
+            onToggleFemaleSlider={() => setShowFemaleSlider(!showFemaleSlider)}
           />
 
           <PaceChart

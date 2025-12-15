@@ -3,13 +3,15 @@ import { distanceLabels } from '../data/worldRecords';
 import { timeStringToSeconds, calculatePace } from './timeUtils';
 
 // Process data: calculate pace and log distance
-export const processData = (records: WorldRecord[], category: 'male' | 'female'): ProcessedRecord[] => {
+export const processData = (records: WorldRecord[], category: 'male' | 'female', speedFactor: number = 100): ProcessedRecord[] => {
   return records.map(record => {
     const timeSeconds = timeStringToSeconds(record.time);
-    const pace = calculatePace(record.distance, timeSeconds);
+    // Apply speed factor (lower percentage = slower time)
+    const adjustedTimeSeconds = timeSeconds * (100 / speedFactor);
+    const pace = calculatePace(record.distance, adjustedTimeSeconds);
     return {
       ...record,
-      timeSeconds,
+      timeSeconds: adjustedTimeSeconds,
       pace,
       logDistance: Math.log10(record.distance),
       displayDistance: distanceLabels[record.distance] || `${record.distance}m`,
