@@ -40,6 +40,7 @@ export const processMyRecords = (myRecords: MyRecords): ProcessedRecord[] => {
       });
     }
   });
+  myData.sort((a, b) => b.distance - a.distance);
   return myData;
 };
 
@@ -66,4 +67,65 @@ export const generateYAxisTicks = (chartData: ProcessedRecord[]): number[] => {
     ticks.push(seconds);
   }
   return ticks;
+};
+
+// Color constants to match ControlPanel
+export const CHART_COLORS = {
+  MALE: '#2563eb',
+  FEMALE: '#db2777', 
+  MINE: '#16a34a'
+} as const;
+
+// Convert data to Nivo format
+export const convertToNivoFormat = (
+  maleData: ProcessedRecord[],
+  femaleData: ProcessedRecord[],
+  myData: ProcessedRecord[],
+  showMale: boolean,
+  showFemale: boolean,
+  showMyPBs: boolean
+) => {
+  const nivoData: Array<{
+    id: string;
+    color: string;
+    data: Array<{ x: number; y: number; originalData: ProcessedRecord }>;
+  }> = [];
+
+  if (showMale && maleData.length > 0) {
+    nivoData.push({
+      id: 'Men WRs',
+      color: CHART_COLORS.MALE,
+      data: maleData.map(d => ({
+        x: d.logDistance,
+        y: d.pace,
+        originalData: d
+      }))
+    });
+  }
+
+  if (showFemale && femaleData.length > 0) {
+    nivoData.push({
+      id: 'Women WRs',
+      color: CHART_COLORS.FEMALE,
+      data: femaleData.map(d => ({
+        x: d.logDistance,
+        y: d.pace,
+        originalData: d
+      }))
+    });
+  }
+
+  if (showMyPBs && myData.length > 0) {
+    nivoData.push({
+      id: 'My PBs',
+      color: CHART_COLORS.MINE,
+      data: myData.map(d => ({
+        x: d.logDistance,
+        y: d.pace,
+        originalData: d
+      }))
+    });
+  }
+
+  return nivoData;
 };

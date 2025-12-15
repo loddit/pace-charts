@@ -15,7 +15,6 @@ const AthleticsRecordsChart: React.FC = () => {
   const [myRecords, setMyRecords] = useState<MyRecords>({});
   const [editingRecords, setEditingRecords] = useState<MyRecords>({});
   const [isDark, setIsDark] = useState<boolean>(false);
-  const [clickedPoint, setClickedPoint] = useState<ProcessedRecord | null>(null);
 
   // Load from localStorage
   useEffect(() => {
@@ -103,13 +102,7 @@ const AthleticsRecordsChart: React.FC = () => {
     ...(showMyPBs ? myData : [])
   ];
 
-  // Handle chart click
-  const handleChartClick = (e: unknown) => {
-    // Click outside points to close tooltip
-    if (!e || !(e as { activePayload?: unknown }).activePayload) {
-      setClickedPoint(null);
-    }
-  };
+
 
   return (
     <div
@@ -180,9 +173,6 @@ const AthleticsRecordsChart: React.FC = () => {
             showFemale={showFemale}
             showMyPBs={showMyPBs}
             isDark={isDark}
-            clickedPoint={clickedPoint}
-            onPointClick={setClickedPoint}
-            onChartClick={handleChartClick}
           />
 
           <EditRecordsModal
