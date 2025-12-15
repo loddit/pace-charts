@@ -1,182 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
-import { ComposedChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line } from 'recharts';
-import { Sun, Moon } from 'lucide-react';
-
-// Types
-interface WorldRecord {
-  distance: number;
-  name: string;
-  year: number;
-  time: string;
-}
-
-interface ProcessedRecord extends WorldRecord {
-  timeSeconds: number;
-  pace: number;
-  logDistance: number;
-  displayDistance: string;
-  category: 'male' | 'female' | 'mine';
-}
-
-interface MyRecords {
-  [key: string]: string;
-}
-
-interface DistanceLabels {
-  [key: number]: string;
-}
-
-// World record data - stored as time strings
-const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
-  male: [
-    { distance: 100, name: 'Usain Bolt', year: 2009, time: '9.58' },
-    { distance: 200, name: 'Usain Bolt', year: 2009, time: '19.19' },
-    { distance: 400, name: 'Wayde van Niekerk', year: 2016, time: '43.03' },
-    { distance: 800, name: 'David Rudisha', year: 2012, time: '1:40.91' },
-    { distance: 1000, name: 'Noah Ngeny', year: 1999, time: '2:11.96' },
-    { distance: 1500, name: 'Hicham El Guerrouj', year: 1998, time: '3:26.00' },
-    { distance: 5000, name: 'Joshua Cheptegei', year: 2020, time: '12:35.36' },
-    { distance: 10000, name: 'Joshua Cheptegei', year: 2020, time: '26:11.00' },
-    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2021, time: '57:31' },
-    { distance: 42195, name: 'Kelvin Kiptum', year: 2023, time: '2:00:35' }
-  ],
-  female: [
-    { distance: 100, name: 'Florence Griffith-Joyner', year: 1988, time: '10.49' },
-    { distance: 200, name: 'Florence Griffith-Joyner', year: 1988, time: '21.34' },
-    { distance: 400, name: 'Marita Koch', year: 1985, time: '47.60' },
-    { distance: 800, name: 'Jarmila Kratochvílová', year: 1983, time: '1:53.28' },
-    { distance: 1000, name: 'Svetlana Masterkova', year: 1996, time: '2:28.98' },
-    { distance: 1500, name: 'Faith Kipyegon', year: 2023, time: '3:49.04' },
-    { distance: 5000, name: 'Faith Kipyegon', year: 2023, time: '14:05.20' },
-    { distance: 10000, name: 'Beatrice Chebet', year: 2024, time: '28:54.14' },
-    { distance: 21097.5, name: 'Ruth Chepngetich', year: 2024, time: '1:04:16' },
-    { distance: 42195, name: 'Ruth Chepngetich', year: 2024, time: '2:09:56' }
-  ]
-};
-
-// Distance labels
-const distanceLabels: DistanceLabels = {
-  100: '100m',
-  200: '200m',
-  400: '400m',
-  800: '800m',
-  1000: '1000m',
-  1500: '1500m',
-  5000: '5km',
-  10000: '10km',
-  21097.5: 'Half',
-  42195: 'Full'
-};
-
-// Convert time string to seconds
-const timeStringToSeconds = (timeStr: string): number => {
-  const parts = timeStr.split(':');
-  let seconds = 0;
-  
-  if (parts.length === 3) {
-    // Format: H:MM:SS
-    seconds = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseFloat(parts[2]);
-  } else if (parts.length === 2) {
-    // Format: M:SS or MM:SS
-    seconds = parseInt(parts[0]) * 60 + parseFloat(parts[1]);
-  } else {
-    // Format: SS.ss
-    seconds = parseFloat(timeStr);
-  }
-  
-  return seconds;
-};
-
-// Calculate pace (seconds/km)
-const calculatePace = (distance: number, timeSeconds: number): number => {
-  return (timeSeconds / (distance / 1000));
-};
-
-// Format time display
-const formatTime = (timeStr: string): string => {
-  const seconds = timeStringToSeconds(timeStr);
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = (seconds % 60).toFixed(2);
-  
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.padStart(5, '0')}`;
-  }
-  return `${minutes}:${secs.padStart(5, '0')}`;
-};
-
-// Tooltip types
-interface TooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    payload: ProcessedRecord;
-  }>;
-}
-
-// Custom tooltip component (defined outside of render)
-const CustomTooltip: React.FC<TooltipProps & { clickedPoint: ProcessedRecord | null }> = ({ 
-  active, 
-  payload, 
-  clickedPoint 
-}) => {
-  // Show tooltip on hover OR if point is clicked
-  const shouldShow = active || (clickedPoint && payload && payload.length > 0 && 
-    payload[0].payload.distance === clickedPoint.distance &&
-    payload[0].payload.category === clickedPoint.category);
-  
-  if (shouldShow && payload && payload.length) {
-    const data: ProcessedRecord = payload[0].payload;
-    const minutes = Math.floor(data.pace / 60);
-    const seconds = Math.floor(data.pace % 60);
-    
-    if (data.category === 'mine') {
-      // Calculate percentage vs male/female world records
-      const maleRecord = worldRecords.male.find(r => r.distance === data.distance);
-      const femaleRecord = worldRecords.female.find(r => r.distance === data.distance);
-      
-      let malePercent: string | null = null;
-      let femalePercent: string | null = null;
-      
-      if (maleRecord) {
-        const maleSeconds = timeStringToSeconds(maleRecord.time);
-        const malePace = calculatePace(maleRecord.distance, maleSeconds);
-        malePercent = ((malePace / data.pace) * 100).toFixed(1);
-      }
-      
-      if (femaleRecord) {
-        const femaleSeconds = timeStringToSeconds(femaleRecord.time);
-        const femalePace = calculatePace(femaleRecord.distance, femaleSeconds);
-        femalePercent = ((femalePace / data.pace) * 100).toFixed(1);
-      }
-      
-      return (
-        <div className="bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-          <p className="font-bold">{data.displayDistance} - My PB</p>
-          <p>Time: {formatTime(data.time)}</p>
-          <p className="font-semibold">Pace: {minutes}:{seconds.toString().padStart(2, '0')}/km</p>
-          {malePercent && (
-            <p className="text-blue-600 mt-1">vs Men WR: {malePercent}%</p>
-          )}
-          {femalePercent && (
-            <p className="text-pink-600">vs Women WR: {femalePercent}%</p>
-          )}
-        </div>
-      );
-    }
-    
-    return (
-      <div className="bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-        <p className="font-bold">{data.displayDistance}</p>
-        <p>Athlete: {data.name}</p>
-        <p>Year: {data.year}</p>
-        <p>Time: {formatTime(data.time)}</p>
-        <p className="font-semibold">Pace: {minutes}:{seconds.toString().padStart(2, '0')}/km</p>
-      </div>
-    );
-  }
-  return null;
-};
+import type { ProcessedRecord, MyRecords } from './data/types';
+import { worldRecords } from './data/worldRecords';
+import { processData, processMyRecords } from './utils/dataProcessing';
+import { PaceChart } from './components/PaceChart';
+import { EditRecordsModal } from './components/EditRecordsModal';
+import { ThemeToggle } from './components/ThemeToggle';
+import { ControlPanel } from './components/ControlPanel';
 
 const AthleticsRecordsChart: React.FC = () => {
   const [showMale, setShowMale] = useState<boolean>(true);
@@ -256,50 +85,16 @@ const AthleticsRecordsChart: React.FC = () => {
     setShowModal(false);
   };
 
-  // Process data: calculate pace and log distance
-  const processData = (records: WorldRecord[], category: 'male' | 'female'): ProcessedRecord[] => {
-    return records.map(record => {
-      const timeSeconds = timeStringToSeconds(record.time);
-      const pace = calculatePace(record.distance, timeSeconds);
-      return {
-        ...record,
-        timeSeconds,
-        pace,
-        logDistance: Math.log10(record.distance),
-        displayDistance: distanceLabels[record.distance] || `${record.distance}m`,
-        category
-      };
-    });
+  // Clear all records
+  const handleClearAll = (): void => {
+    setEditingRecords({});
+    saveRecords({});
   };
 
-  // Process my records
-  const processMyRecords = (): ProcessedRecord[] => {
-    const myData: ProcessedRecord[] = [];
-    Object.keys(myRecords).forEach(distance => {
-      const time = myRecords[distance];
-      if (time && time.trim()) {
-        const distanceNum = parseFloat(distance);
-        const timeSeconds = timeStringToSeconds(time);
-        const pace = calculatePace(distanceNum, timeSeconds);
-        myData.push({
-          distance: distanceNum,
-          time,
-          timeSeconds,
-          pace,
-          logDistance: Math.log10(distanceNum),
-          displayDistance: distanceLabels[distanceNum] || `${distanceNum}m`,
-          category: 'mine',
-          name: 'Me',
-          year: new Date().getFullYear()
-        });
-      }
-    });
-    return myData;
-  };
-
+  // Process data
   const maleData = processData(worldRecords.male, 'male');
   const femaleData = processData(worldRecords.female, 'female');
-  const myData = processMyRecords();
+  const myData = processMyRecords(myRecords);
 
   // Combine data based on toggles
   const chartData: ProcessedRecord[] = [
@@ -308,48 +103,13 @@ const AthleticsRecordsChart: React.FC = () => {
     ...(showMyPBs ? myData : [])
   ];
 
-  // Create fit line data
-  const createFitLine = (data: ProcessedRecord[]): ProcessedRecord[] => {
-    if (!data || data.length === 0) return [];
-    return [...data].sort((a, b) => a.logDistance - b.logDistance);
-  };
-
-  const maleFitLine = createFitLine(maleData);
-  const femaleFitLine = createFitLine(femaleData);
-  const myFitLine = createFitLine(myData);
-
-  // Get all scatter logDistance values as ticks
-  const allDistances = [...maleData, ...femaleData, ...myData];
-  const uniqueLogDistances = [...new Set(allDistances.map(d => d.logDistance))].sort((a, b) => a - b);
-  const xAxisTicks = uniqueLogDistances;
-
-  // Generate Y-axis ticks (every 30 seconds, auto-range based on data)
-  const generateYAxisTicks = (): number[] => {
-    if (chartData.length === 0) return [90, 120, 150, 180, 210, 240, 270, 300];
-    
-    const paces = chartData.map(d => d.pace);
-    const minPace = Math.min(...paces);
-    const maxPace = Math.max(...paces);
-    
-    // Round to nearest 30 seconds
-    const minTick = Math.floor(minPace / 30) * 30;
-    const maxTick = Math.ceil(maxPace / 30) * 30;
-    
-    const ticks: number[] = [];
-    for (let seconds = minTick; seconds <= maxTick; seconds += 30) {
-      ticks.push(seconds);
+  // Handle chart click
+  const handleChartClick = (e: unknown) => {
+    // Click outside points to close tooltip
+    if (!e || !(e as { activePayload?: unknown }).activePayload) {
+      setClickedPoint(null);
     }
-    return ticks;
   };
-
-  const yAxisTicks = generateYAxisTicks();
-  const yAxisDomain: [number, number] = chartData.length > 0 
-    ? [Math.min(...yAxisTicks), Math.max(...yAxisTicks)]
-    : [90, 300];
-
-  
-
-  const showEmptyState = chartData.length === 0;
 
   return (
     <div
@@ -392,32 +152,7 @@ const AthleticsRecordsChart: React.FC = () => {
             </h2>
           </div>
 
-          {/* Theme toggle switch */}
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isDark}
-              onChange={toggleTheme}
-              className="sr-only peer"
-            />
-            <div
-              className={`w-10 h-6 rounded-full peer transition-colors ${
-                isDark ? "bg-blue-600" : "bg-gray-300"
-              } peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500`}
-            >
-              <div
-                className={`absolute top-0.5 left-0.5 bg-white rounded-full h-5 w-5 transition-transform flex items-center justify-center ${
-                  isDark ? "translate-x-4" : "translate-x-0"
-                }`}
-              >
-                {isDark ? (
-                  <Moon size={14} className="text-gray-700" />
-                ) : (
-                  <Sun size={14} className="text-yellow-500" />
-                )}
-              </div>
-            </div>
-          </label>
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>
 
         <div
@@ -425,298 +160,42 @@ const AthleticsRecordsChart: React.FC = () => {
             isDark ? "bg-gray-800" : "bg-white"
           }`}
         >
-          {/* Toggle switches */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showMale}
-                  onChange={(e) => setShowMale(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  style={{
-                    accentColor: "#2563eb",
-                  }}
-                />
-                <span className="font-medium text-sm sm:text-base text-blue-600">
-                  Men WRs
-                </span>
-              </label>
+          <ControlPanel
+            showMale={showMale}
+            showFemale={showFemale}
+            showMyPBs={showMyPBs}
+            isDark={isDark}
+            onMaleToggle={setShowMale}
+            onFemaleToggle={setShowFemale}
+            onMyPBsToggle={handleMyPBsToggle}
+            onUpdateMyPBs={openModal}
+          />
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showFemale}
-                  onChange={(e) => setShowFemale(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                  style={{
-                    accentColor: "#db2777",
-                  }}
-                />
-                <span className="font-medium text-sm sm:text-base text-pink-600">
-                  Women WRs
-                </span>
-              </label>
+          <PaceChart
+            chartData={chartData}
+            maleData={maleData}
+            femaleData={femaleData}
+            myData={myData}
+            showMale={showMale}
+            showFemale={showFemale}
+            showMyPBs={showMyPBs}
+            isDark={isDark}
+            clickedPoint={clickedPoint}
+            onPointClick={setClickedPoint}
+            onChartClick={handleChartClick}
+          />
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showMyPBs}
-                  onChange={(e) => handleMyPBsToggle(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  style={{
-                    accentColor: "#16a34a",
-                  }}
-                />
-                <span className="font-medium text-sm sm:text-base text-green-600">
-                  My PBs
-                </span>
-              </label>
-
-              {showMyPBs && (
-                <button
-                  onClick={openModal}
-                  className={`text-xs px-2 py-1 rounded transition-all ${
-                    isDark
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-200"
-                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  Update My PBs
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Chart */}
-          {!showEmptyState ? (
-            <ResponsiveContainer
-              width="100%"
-              height={400}
-              className="sm:h-[500px]"
-            >
-              <ComposedChart
-                margin={{ top: 20, right: 10, bottom: 20, left: 10 }}
-                onClick={(e: unknown) => {
-                  // Click outside points to close tooltip
-                  if (!e || !(e as { activePayload?: unknown }).activePayload) {
-                    setClickedPoint(null);
-                  }
-                }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke={isDark ? "#4b5563" : "#e0e0e0"}
-                />
-                <XAxis
-                  type="number"
-                  dataKey="logDistance"
-                  name="Distance"
-                  domain={["dataMin - 0.1", "dataMax + 0.1"]}
-                  ticks={xAxisTicks.length > 0 ? xAxisTicks : undefined}
-                  tickFormatter={(value: number) => {
-                    const distance = Math.pow(10, value);
-                    return (
-                      distanceLabels[Math.round(distance * 10)/10] ||
-                      `${Math.round(distance)}m`
-                    );
-                  }}
-                  tick={{ fontSize: 10, fill: isDark ? "#d1d5db" : "#000" }}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="pace"
-                  name="Pace"
-                  reversed={true}
-                  domain={yAxisDomain}
-                  ticks={yAxisTicks}
-                  width={35}
-                  tickFormatter={(value: number) => {
-                    const minutes = Math.floor(value / 60);
-                    const seconds = Math.floor(value % 60);
-                    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-                  }}
-                  tick={{ fontSize: 10, fill: isDark ? "#d1d5db" : "#000" }}
-                />
-                <Tooltip
-                  content={<CustomTooltip clickedPoint={clickedPoint} />}
-                />
-
-                {/* Fit lines - hidden from legend */}
-                {showMale && maleFitLine.length > 1 && (
-                  <Line
-                    type="monotone"
-                    dataKey="pace"
-                    data={maleFitLine}
-                    stroke="#93c5fd"
-                    strokeWidth={2}
-                    dot={false}
-                    legendType="none"
-                  />
-                )}
-                {showFemale && femaleFitLine.length > 1 && (
-                  <Line
-                    type="monotone"
-                    dataKey="pace"
-                    data={femaleFitLine}
-                    stroke="#fbcfe8"
-                    strokeWidth={2}
-                    dot={false}
-                    legendType="none"
-                  />
-                )}
-                {showMyPBs && myFitLine.length > 1 && (
-                  <Line
-                    type="monotone"
-                    dataKey="pace"
-                    data={myFitLine}
-                    stroke="#86efac"
-                    strokeWidth={2}
-                    dot={false}
-                    legendType="none"
-                  />
-                )}
-
-                {/* Scatter points */}
-                {showMale && (
-                  <Scatter
-                    name=""
-                    data={maleData}
-                    fill="#2563eb"
-                    shape="circle"
-                    r={6}
-                    onClick={(data: ProcessedRecord) => setClickedPoint(data)}
-                    style={{ cursor: "pointer" }}
-                    legendType="none"
-                  />
-                )}
-                {showFemale && (
-                  <Scatter
-                    name=""
-                    data={femaleData}
-                    fill="#db2777"
-                    shape="circle"
-                    r={6}
-                    onClick={(data: ProcessedRecord) => setClickedPoint(data)}
-                    style={{ cursor: "pointer" }}
-                    legendType="none"
-                  />
-                )}
-                {showMyPBs && myData.length > 0 && (
-                  <Scatter
-                    name=""
-                    data={myData}
-                    fill="#16a34a"
-                    shape="circle"
-                    r={6}
-                    onClick={(data: ProcessedRecord) => setClickedPoint(data)}
-                    style={{ cursor: "pointer" }}
-                    legendType="none"
-                  />
-                )}
-              </ComposedChart>
-            </ResponsiveContainer>
-          ) : (
-            <div
-              className={`text-center py-12 sm:py-20 ${
-                isDark ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              <p className="text-base sm:text-lg">No data to display</p>
-              <p className="text-xs sm:text-sm mt-2">
-                Please select at least one category above
-              </p>
-            </div>
-          )}
-
-          {/* Modal */}
-          {showModal && (
-            <div
-              className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-              onClick={() => setShowModal(false)}
-            >
-              <div
-                className={`rounded-lg p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
-                  isDark ? "bg-gray-800 text-white" : "bg-white"
-                }`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-                  Edit My Personal Bests
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {[
-                    100, 200, 400, 800, 1000, 1500, 5000, 10000, 21097.5, 42195,
-                  ].map((distance) => {
-                    const maleWR = worldRecords.male.find(
-                      (r) => r.distance === distance
-                    );
-                    const placeholder = maleWR ? maleWR.time : "";
-
-                    return (
-                      <div key={distance} className="flex items-center gap-2">
-                        <label className="w-16 sm:w-20 font-medium text-sm sm:text-base">
-                          {distanceLabels[distance]}:
-                        </label>
-                        <input
-                          type="text"
-                          value={editingRecords[distance] || ""}
-                          onChange={(e) =>
-                            handleInputChange(distance, e.target.value)
-                          }
-                          placeholder={placeholder}
-                          className={`flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            isDark
-                              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                              : "bg-white border-gray-300"
-                          }`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "Are you sure you want to clear all personal records?"
-                        )
-                      ) {
-                        setEditingRecords({});
-                        saveRecords({});
-                      }
-                    }}
-                    className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-red-500 text-white rounded hover:bg-red-600 transition-all"
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className={`w-full sm:w-auto px-4 py-2 text-sm sm:text-base rounded transition-all ${
-                      isDark
-                        ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
-                        : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <EditRecordsModal
+            showModal={showModal}
+            editingRecords={editingRecords}
+            isDark={isDark}
+            onClose={() => setShowModal(false)}
+            onInputChange={handleInputChange}
+            onSave={handleSave}
+            onClearAll={handleClearAll}
+          />
         </div>
+        
         <div
           className={`mt-4 sm:mt-6 flex flex-col gap-2 text-sm items-center px-2 ${
             isDark ? "text-gray-400" : "text-gray-500"
