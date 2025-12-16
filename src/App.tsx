@@ -237,19 +237,34 @@ const AthleticsRecordsChart: React.FC = () => {
             isDark ? "text-gray-400" : "text-gray-500"
           }`}
         >
-          <p>
-            WRs data source:{" "}
-            <a
-              href="https://en.wikipedia.org/wiki/List_of_world_records_in_athletics"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`underline hover:no-underline ${
-                isDark ? "text-stone-400" : "text-stone-600"
-              }`}
-            >
-              Wikipedia
-            </a>
-          </p>
+          <div className='flex gap-4'>
+            <div>
+              WRs data source:{" "}
+              <a
+                href="https://en.wikipedia.org/wiki/List_of_world_records_in_athletics"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`underline hover:no-underline ${
+                  isDark ? "text-stone-400" : "text-stone-600"
+                }`}
+              >
+                Wikipedia
+              </a>
+            </div>
+            <div>
+              Source Code:{" "}
+              <a
+                href='https://github.com/loddit/pace-charts'
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`underline hover:no-underline ${
+                  isDark ? "text-stone-400" : "text-stone-600"
+                }`}
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             Presented by
             <a href="https://parco.run" target='_blank'>
