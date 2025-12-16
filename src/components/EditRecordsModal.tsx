@@ -1,6 +1,8 @@
 import React from 'react';
 import type { MyRecords } from '../data/types';
 import { worldRecords, distanceLabels, standardDistances } from '../data/worldRecords';
+import { X } from 'lucide-react';
+
 
 interface EditRecordsModalProps {
   title: string;
@@ -54,9 +56,18 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-          {title}
-        </h2>
+        <div className="flex justify-between">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="-mt-4 text-md transition-all cursor-pointer"
+          >
+            <X />
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {standardDistances.map((distance) => {
@@ -66,8 +77,8 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
             const placeholder = maleWR ? maleWR.time : "";
 
             return (
-              <div key={distance} className="flex items-center gap-2">
-                <label className="w-16 sm:w-20 font-medium text-sm sm:text-base">
+              <div key={distance} className="flex justify-between items-center gap-2">
+                <label className="w-25 text-sm">
                   {distanceLabels[distance]}:
                 </label>
                 <input
@@ -77,7 +88,7 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
                     onInputChange(distance, e.target.value)
                   }
                   placeholder={placeholder}
-                  className={`flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-48 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     isDark
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                       : "bg-white border-gray-300"
@@ -104,17 +115,7 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
           >
             Clear All
           </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className={`w-full sm:w-auto px-4 py-2 text-sm sm:text-base rounded transition-all ${
-              isDark
-                ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
-                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-            }`}
-          >
-            Cancel
-          </button>
+
           <button
             type="button"
             onClick={onFinish}
