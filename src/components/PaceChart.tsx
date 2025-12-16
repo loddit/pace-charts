@@ -66,7 +66,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
     >
       <ResponsiveLine
         data={nivoData}
-        margin={{ top: 20, right: 10, bottom: 60, left: 50 }}
+        margin={{ top: 20, right: 0, bottom: 40, left: 30 }}
         xScale={{ type: 'linear', min: 'auto', max: "auto" }}
         yScale={{ 
           type: 'linear', 
