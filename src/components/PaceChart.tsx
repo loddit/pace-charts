@@ -66,7 +66,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
     >
       <ResponsiveLine
         data={nivoData}
-        margin={{ top: 20, right: 0, bottom: 50, left: 30 }}
+        margin={{ top: 20, right: 0, bottom: 80, left: 30 }}
         xScale={{ type: 'linear', min: 'auto', max: "auto" }}
         yScale={{ 
           type: 'linear', 
@@ -80,7 +80,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: 45,
+          tickRotation: 90,
           tickValues: uniqueLogDistances,
           format: (value: number) => {
             const distance = Math.pow(10, value);
@@ -192,10 +192,12 @@ export const PaceChart: React.FC<PaceChartProps> = ({
               </div>
             );
           }
+          
+          const gender = {male: 'Men', female: 'Woman'}[data.category]
 
           return (
             <div className="w-48 bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-              <p className="font-bold">{data.displayDistance} World Record</p>
+              <p className="font-bold">{data.displayDistance} WR {gender}</p>
               <p>Athlete: {data.name}</p>
               <p>Year: {data.year}</p>
               <p>Time: {data.time}</p>

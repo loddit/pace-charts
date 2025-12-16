@@ -38,8 +38,8 @@ export const distanceLabels: DistanceLabels = {
   1500: '1500m',
   5000: '5000m',
   10000: '10000m',
-  21097.5: 'Half',
-  42195: 'Full'
+  21097.5: 'Half Marathon',
+  42195: 'Full Marathon'
 };
 
 // Standard distances for form inputs
