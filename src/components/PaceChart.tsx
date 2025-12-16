@@ -66,7 +66,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
     >
       <ResponsiveLine
         data={nivoData}
-        margin={{ top: 20, right: 0, bottom: 40, left: 30 }}
+        margin={{ top: 20, right: 0, bottom: 50, left: 30 }}
         xScale={{ type: 'linear', min: 'auto', max: "auto" }}
         yScale={{ 
           type: 'linear', 
@@ -80,7 +80,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: 0,
+          tickRotation: 45,
           tickValues: uniqueLogDistances,
           format: (value: number) => {
             const distance = Math.pow(10, value);

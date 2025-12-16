@@ -36,8 +36,8 @@ export const distanceLabels: DistanceLabels = {
   800: '800m',
   1000: '1000m',
   1500: '1500m',
-  5000: '5km',
-  10000: '10km',
+  5000: '5000m',
+  10000: '10000m',
   21097.5: 'Half',
   42195: 'Full'
 };
