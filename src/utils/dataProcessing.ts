@@ -21,7 +21,7 @@ export const processData = (records: WorldRecord[], category: 'male' | 'female',
 };
 
 // Process my records
-export const processMyRecords = (myRecords: MyRecords): ProcessedRecord[] => {
+export const processRecords = (myRecords: MyRecords, name: string): ProcessedRecord[] => {
   const myData: ProcessedRecord[] = [];
   Object.keys(myRecords).forEach(distance => {
     const time = myRecords[distance];
@@ -37,7 +37,7 @@ export const processMyRecords = (myRecords: MyRecords): ProcessedRecord[] => {
         logDistance: Math.log10(distanceNum),
         displayDistance: distanceLabels[distanceNum] || `${distanceNum}m`,
         category: 'mine',
-        name: 'Me',
+        name: name,
         year: new Date().getFullYear()
       });
     }
@@ -75,7 +75,8 @@ export const generateYAxisTicks = (chartData: ProcessedRecord[]): number[] => {
 export const CHART_COLORS = {
   MALE: '#2563eb',
   FEMALE: '#db2777', 
-  MINE: '#16a34a'
+  MINE: '#16a34a',
+  RIVAL: '#f54a00'
 } as const;
 
 // Convert data to Nivo format
@@ -83,9 +84,11 @@ export const convertToNivoFormat = (
   maleData: ProcessedRecord[],
   femaleData: ProcessedRecord[],
   myData: ProcessedRecord[],
+  rivalData: ProcessedRecord[],
   showMale: boolean,
   showFemale: boolean,
-  showMyPBs: boolean
+  showMyPBs: boolean,
+  showRivalPBs: boolean
 ) => {
   const nivoData: Array<{
     id: string;
@@ -122,6 +125,19 @@ export const convertToNivoFormat = (
       id: 'My PBs',
       color: CHART_COLORS.MINE,
       data: myData.map(d => ({
+        x: d.logDistance,
+        y: d.pace,
+        originalData: d
+      }))
+    });
+  }
+
+
+  if (showRivalPBs && rivalData.length > 0) {
+    nivoData.push({
+      id: 'Rival\'s PBs',
+      color: CHART_COLORS.RIVAL,
+      data: rivalData.map(d => ({
         x: d.logDistance,
         y: d.pace,
         originalData: d

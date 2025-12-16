@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ProcessedRecord, MyRecords } from './data/types';
 import { worldRecords } from './data/worldRecords';
-import { processData, processMyRecords } from './utils/dataProcessing';
+import { processData, processRecords } from './utils/dataProcessing';
 import { PaceChart } from './components/PaceChart';
 import { EditRecordsModal } from './components/EditRecordsModal';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -11,10 +11,14 @@ const AthleticsRecordsChart: React.FC = () => {
   const [showMale, setShowMale] = useState<boolean>(true);
   const [showFemale, setShowFemale] = useState<boolean>(true);
   const [showMyPBs, setShowMyPBs] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showMyPBsModal, setShowMyPBsModal] = useState<boolean>(false);
   const [myRecords, setMyRecords] = useState<MyRecords>({});
-  const [editingRecords, setEditingRecords] = useState<MyRecords>({});
+  const [editingMyRecords, setEditingMyRecords] = useState<MyRecords>({});
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [showRivalPBs, setShowRivalPBs] = useState<boolean>(false);
+  const [showRivalPBsModal, setShowRivalPBsModal] = useState<boolean>(false);
+  const [rivalRecords, setRivalRecords] = useState<MyRecords>({});
+  const [editingRivalRecords, setEditingRivalRecords] = useState<MyRecords>({});
   const [maleSpeedFactor, setMaleSpeedFactor] = useState<number>(100);
   const [femaleSpeedFactor, setFemaleSpeedFactor] = useState<number>(100);
   const [showMaleSlider, setShowMaleSlider] = useState<boolean>(false);
@@ -23,16 +27,26 @@ const AthleticsRecordsChart: React.FC = () => {
   // Load from localStorage
   useEffect(() => {
     const loadData = () => {
-      const saved = localStorage.getItem('myAthletics');
-      if (saved) {
+      const mySaved = localStorage.getItem('myAthletics');
+      if (mySaved) {
         try {
-          const parsed = JSON.parse(saved);
+          const parsed = JSON.parse(mySaved);
           setMyRecords(parsed);
         } catch (e) {
           console.error('Failed to load records:', e);
         }
       }
       
+      const saved = localStorage.getItem('rivalAthletics');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setRivalRecords(parsed);
+        } catch (e) {
+          console.error('Failed to load records:', e);
+        }
+      }
+ 
       const savedTheme = localStorage.getItem('athleticsTheme');
       if (savedTheme) {
         setIsDark(savedTheme === 'dark');
@@ -43,9 +57,14 @@ const AthleticsRecordsChart: React.FC = () => {
   }, []);
 
   // Save to localStorage
-  const saveRecords = (records: MyRecords): void => {
+  const saveMyRecords = (records: MyRecords): void => {
     localStorage.setItem('myAthletics', JSON.stringify(records));
     setMyRecords(records);
+  };
+
+  const saveRivalRecords = (records: MyRecords): void => {
+    localStorage.setItem('rivalAthletics', JSON.stringify(records));
+    setRivalRecords(records);
   };
 
   // Save theme preference
@@ -62,50 +81,51 @@ const AthleticsRecordsChart: React.FC = () => {
       const recordCount = Object.keys(myRecords).filter(key => myRecords[key] && myRecords[key].trim()).length;
       if (recordCount === 0) {
         // Open modal immediately if no data exists
-        openModal();
+        openMyPBsModal();
       }
     }
     setShowMyPBs(checked);
   };
 
+  const handleRivalPBsToggle = (checked: boolean): void => {
+    if (checked) {
+      // Check if user has any data at all
+      const recordCount = Object.keys(rivalRecords).filter(key => rivalRecords[key] && rivalRecords[key].trim()).length;
+      if (recordCount === 0) {
+        // Open modal immediately if no data exists
+        openRivalPBsModal();
+      }
+    }
+    setShowRivalPBs(checked);
+  };
+
+
   // Open modal
-  const openModal = (): void => {
-    setEditingRecords({ ...myRecords });
-    setShowModal(true);
+  const openMyPBsModal = (): void => {
+    setEditingMyRecords({ ...myRecords });
+    setShowMyPBsModal(true);
   };
 
-  // Handle input change
-  const handleInputChange = (distance: number, value: string): void => {
-    setEditingRecords({
-      ...editingRecords,
-      [distance]: value
-    });
+  const openRivalPBsModal = (): void => {
+    setEditingRivalRecords({ ...rivalRecords });
+    setShowRivalPBsModal(true);
   };
 
-  // Save edits
-  const handleSave = (): void => {
-    saveRecords(editingRecords);
-    setShowModal(false);
-  };
 
-  // Clear all records
-  const handleClearAll = (): void => {
-    setEditingRecords({});
-    saveRecords({});
-  };
 
   // Process data
   const maleData = processData(worldRecords.male, 'male', maleSpeedFactor);
   const femaleData = processData(worldRecords.female, 'female', femaleSpeedFactor);
-  const myData = processMyRecords(myRecords);
+  const myData = processRecords(myRecords, 'My PB');
+  const rivalData = processRecords(rivalRecords, "Rival's PB");
 
   // Combine data based on toggles
   const chartData: ProcessedRecord[] = [
     ...(showMale ? maleData : []),
     ...(showFemale ? femaleData : []),
-    ...(showMyPBs ? myData : [])
+    ...(showMyPBs ? myData : []),
+    ...(showRivalPBs ? rivalData : [])
   ];
-
 
 
   return (
@@ -161,6 +181,7 @@ const AthleticsRecordsChart: React.FC = () => {
             showMale={showMale}
             showFemale={showFemale}
             showMyPBs={showMyPBs}
+            showRivalPBs={showRivalPBs}
             maleSpeedFactor={maleSpeedFactor}
             femaleSpeedFactor={femaleSpeedFactor}
             showMaleSlider={showMaleSlider}
@@ -168,7 +189,9 @@ const AthleticsRecordsChart: React.FC = () => {
             onMaleToggle={setShowMale}
             onFemaleToggle={setShowFemale}
             onMyPBsToggle={handleMyPBsToggle}
-            onUpdateMyPBs={openModal}
+            onRivalPBsToggle={handleRivalPBsToggle}
+            onUpdateRivalPBs={openRivalPBsModal}
+            onUpdateMyPBs={openMyPBsModal}
             onMaleSpeedFactorChange={setMaleSpeedFactor}
             onFemaleSpeedFactorChange={setFemaleSpeedFactor}
             onToggleMaleSlider={() => setShowMaleSlider(!showMaleSlider)}
@@ -180,21 +203,33 @@ const AthleticsRecordsChart: React.FC = () => {
             maleData={maleData}
             femaleData={femaleData}
             myData={myData}
+            rivalData={rivalData}
             showMale={showMale}
             showFemale={showFemale}
             showMyPBs={showMyPBs}
+            showRivalPBs={showRivalPBs}
             isDark={isDark}
           />
 
           <EditRecordsModal
-            showModal={showModal}
-            editingRecords={editingRecords}
+            title="Edit My Personal Bests"
+            showModal={showMyPBsModal}
+            editingRecords={editingMyRecords}
             isDark={isDark}
-            onClose={() => setShowModal(false)}
-            onInputChange={handleInputChange}
-            onSave={handleSave}
-            onClearAll={handleClearAll}
+            onClose={() => setShowMyPBsModal(false)}
+            onSave={saveMyRecords}
+            onEdit={setEditingMyRecords}
           />
+          <EditRecordsModal
+            title="Edit Rival's Personal Bests"
+            showModal={showRivalPBsModal}
+            editingRecords={editingRivalRecords}
+            isDark={isDark}
+            onClose={() => setShowRivalPBsModal(false)}
+            onSave={saveRivalRecords}
+            onEdit={setEditingRivalRecords}
+          />
+
         </div>
         
         <div

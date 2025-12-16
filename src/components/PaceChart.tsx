@@ -10,9 +10,11 @@ interface PaceChartProps {
   maleData: ProcessedRecord[];
   femaleData: ProcessedRecord[];
   myData: ProcessedRecord[];
+  rivalData: ProcessedRecord[];
   showMale: boolean;
   showFemale: boolean;
   showMyPBs: boolean;
+  showRivalPBs: boolean;
   isDark: boolean;
 }
 
@@ -21,9 +23,11 @@ export const PaceChart: React.FC<PaceChartProps> = ({
   maleData,
   femaleData,
   myData,
+  rivalData,
   showMale,
   showFemale,
   showMyPBs,
+  showRivalPBs,
   isDark,
 }) => {
   const showEmptyState = chartData.length === 0;
@@ -44,7 +48,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
   }
 
   // Convert data to Nivo format
-  const nivoData = convertToNivoFormat(maleData, femaleData, myData, showMale, showFemale, showMyPBs);
+  const nivoData = convertToNivoFormat(maleData, femaleData, myData, rivalData, showMale, showFemale, showMyPBs, showRivalPBs);
 
   // Get all unique log distances for x-axis ticks
   const allDistances = [...maleData, ...femaleData, ...myData];
@@ -176,7 +180,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
             
             return (
               <div className="w-48 bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-                <p className="font-bold">{data.displayDistance} - My PB</p>
+                <p className="font-bold">{data.displayDistance} - {data.name}</p>
                 <p>Time: {data.time}</p>
                 <p className="font-semibold">Pace: {minutes}:{seconds.toString().padStart(2, '0')}/km</p>
                 {malePercent && (
@@ -191,7 +195,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
 
           return (
             <div className="w-48 bg-white p-2 sm:p-3 border border-gray-300 rounded shadow-lg text-xs sm:text-sm max-w-[200px] sm:max-w-none">
-              <p className="font-bold">{data.displayDistance}</p>
+              <p className="font-bold">{data.displayDistance} World Record</p>
               <p>Athlete: {data.name}</p>
               <p>Year: {data.year}</p>
               <p>Time: {data.time}</p>
@@ -205,6 +209,7 @@ export const PaceChart: React.FC<PaceChartProps> = ({
             case 'Men WRs': return CHART_COLORS.MALE;
             case 'Women WRs': return CHART_COLORS.FEMALE;
             case 'My PBs': return CHART_COLORS.MINE;
+            case 'Rival\'s PBs': return CHART_COLORS.RIVAL;
             default: return CHART_COLORS.MALE;
           }
         }}

@@ -3,25 +3,45 @@ import type { MyRecords } from '../data/types';
 import { worldRecords, distanceLabels, standardDistances } from '../data/worldRecords';
 
 interface EditRecordsModalProps {
+  title: string;
   showModal: boolean;
   editingRecords: MyRecords;
   isDark: boolean;
   onClose: () => void;
-  onInputChange: (distance: number, value: string) => void;
-  onSave: () => void;
-  onClearAll: () => void;
+  onEdit: React.Dispatch<React.SetStateAction<MyRecords>>;
+  onSave: (PBs: MyRecords) => void;
 }
 
 export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
+  title,
   showModal,
   editingRecords,
   isDark,
   onClose,
-  onInputChange,
-  onSave,
-  onClearAll
+  onEdit,
+  onSave
 }) => {
   if (!showModal) return null;
+
+  // Handle input change
+  const onInputChange = (distance: number, value: string): void => {
+    onEdit({
+      ...editingRecords,
+      [distance]: value
+    });
+  };
+
+  // Save edits
+  const onFinish = (): void => {
+    onSave(editingRecords);
+    onClose();
+  };
+
+  // Clear all records
+  const onClearAll = (): void => {
+    onEdit({});
+    onSave({});
+  };
 
   return (
     <div
@@ -35,7 +55,7 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-          Edit My Personal Bests
+          {title}
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -97,7 +117,7 @@ export const EditRecordsModal: React.FC<EditRecordsModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={onSave}
+            onClick={onFinish}
             className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
           >
             Save

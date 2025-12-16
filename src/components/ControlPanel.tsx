@@ -28,6 +28,7 @@ interface ControlPanelProps {
   showMale: boolean;
   showFemale: boolean;
   showMyPBs: boolean;
+  showRivalPBs: boolean;
   maleSpeedFactor: number;
   femaleSpeedFactor: number;
   showMaleSlider: boolean;
@@ -35,7 +36,9 @@ interface ControlPanelProps {
   onMaleToggle: (checked: boolean) => void;
   onFemaleToggle: (checked: boolean) => void;
   onMyPBsToggle: (checked: boolean) => void;
+  onRivalPBsToggle: (checked: boolean) => void;
   onUpdateMyPBs: () => void;
+  onUpdateRivalPBs: () => void;
   onMaleSpeedFactorChange: (factor: number) => void;
   onFemaleSpeedFactorChange: (factor: number) => void;
   onToggleMaleSlider: () => void;
@@ -46,6 +49,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   showMale,
   showFemale,
   showMyPBs,
+  showRivalPBs,
   maleSpeedFactor,
   femaleSpeedFactor,
   showMaleSlider,
@@ -53,7 +57,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onMaleToggle,
   onFemaleToggle,
   onMyPBsToggle,
+  onRivalPBsToggle,
   onUpdateMyPBs,
+  onUpdateRivalPBs,
   onMaleSpeedFactorChange,
   onFemaleSpeedFactorChange,
   onToggleMaleSlider,
@@ -185,6 +191,32 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             )}
           </label>
         </div>
+        <div className="flex flex-col items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showRivalPBs}
+              onChange={(e) => onRivalPBsToggle(e.target.checked)}
+              className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+              style={{
+                accentColor: "oklch(64.6% 0.222 41.116)",
+              }}
+            />
+            <span className="font-medium text-sm sm:text-base text-orange-600">
+              Rival's PBs
+            </span>
+            {showRivalPBs && (
+              <button
+                onClick={onUpdateRivalPBs}
+                className='text-orange-600 hover:bg-orange-50 p-1 rounded transition-colors'
+                title="Edit personal bests"
+              >
+                <Edit size={18}/>
+              </button>
+            )}
+          </label>
+        </div>
+
       </div>
     </div>
     </>
