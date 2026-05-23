@@ -11,9 +11,10 @@ export const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
     { distance: 1500, name: 'Hicham El Guerrouj', year: 1998, time: '3:26.00' },
     { distance: 5000, name: 'Joshua Cheptegei', year: 2020, time: '12:35.36' },
     { distance: 10000, name: 'Joshua Cheptegei', year: 2020, time: '26:11.00' },
-    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2021, time: '57:31' },
+    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2026, time: '57:20' },
     { distance: 42195, name: 'Kelvin Kiptum', year: 2023, time: '2:00:35' }
   ],
+
   female: [
     { distance: 100, name: 'Florence Griffith-Joyner', year: 1988, time: '10.49' },
     { distance: 200, name: 'Florence Griffith-Joyner', year: 1988, time: '21.34' },
@@ -23,7 +24,7 @@ export const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
     { distance: 1500, name: 'Faith Kipyegon', year: 2023, time: '3:49.04' },
     { distance: 5000, name: 'Faith Kipyegon', year: 2023, time: '14:05.20' },
     { distance: 10000, name: 'Beatrice Chebet', year: 2024, time: '28:54.14' },
-    { distance: 21097.5, name: 'Ruth Chepngetich', year: 2024, time: '1:04:16' },
+    { distance: 21097.5, name: 'Letesenbet Gidey', year: 2021, time: '1:02:52' },
     { distance: 42195, name: 'Ruth Chepngetich', year: 2024, time: '2:09:56' }
   ]
 };
