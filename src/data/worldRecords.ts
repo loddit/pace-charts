@@ -9,10 +9,11 @@ export const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
     { distance: 800, name: 'David Rudisha', year: 2012, time: '1:40.91' },
     { distance: 1000, name: 'Noah Ngeny', year: 1999, time: '2:11.96' },
     { distance: 1500, name: 'Hicham El Guerrouj', year: 1998, time: '3:26.00' },
+    { distance: 3000, name: 'Daniel Komen', year: 1996, time: '7:20.67' },
     { distance: 5000, name: 'Joshua Cheptegei', year: 2020, time: '12:35.36' },
     { distance: 10000, name: 'Joshua Cheptegei', year: 2020, time: '26:11.00' },
-    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2026, time: '57:20' },
-    { distance: 42195, name: 'Kelvin Kiptum', year: 2023, time: '2:00:35' }
+    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2025, time: '56:42' },
+    { distance: 42195, name: 'Sabastian Sawe', year: 2026, time: '1:59:30' }
   ],
 
   female: [
@@ -21,8 +22,9 @@ export const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
     { distance: 400, name: 'Marita Koch', year: 1985, time: '47.60' },
     { distance: 800, name: 'Jarmila Kratochvílová', year: 1983, time: '1:53.28' },
     { distance: 1000, name: 'Svetlana Masterkova', year: 1996, time: '2:28.98' },
-    { distance: 1500, name: 'Faith Kipyegon', year: 2023, time: '3:49.04' },
-    { distance: 5000, name: 'Faith Kipyegon', year: 2023, time: '14:05.20' },
+    { distance: 1500, name: 'Faith Kipyegon', year: 2025, time: '3:48.68' },
+    { distance: 3000, name: 'Wang Junxia', year: 1993, time: '8:06.11' },
+    { distance: 5000, name: 'Beatrice Chebet', year: 2025, time: '13:58.06' },
     { distance: 10000, name: 'Beatrice Chebet', year: 2024, time: '28:54.14' },
     { distance: 21097.5, name: 'Letesenbet Gidey', year: 2021, time: '1:02:52' },
     { distance: 42195, name: 'Ruth Chepngetich', year: 2024, time: '2:09:56' }
@@ -37,6 +39,7 @@ export const distanceLabels: DistanceLabels = {
   800: '800m',
   1000: '1000m',
   1500: '1500m',
+  3000: '3000m',
   5000: '5000m',
   10000: '10000m',
   21097.5: 'Half Marathon',
@@ -45,5 +48,5 @@ export const distanceLabels: DistanceLabels = {
 
 // Standard distances for form inputs
 export const standardDistances = [
-  100, 200, 400, 800, 1000, 1500, 5000, 10000, 21097.5, 42195
+  100, 200, 400, 800, 1000, 1500, 3000, 5000, 10000, 21097.5, 42195
 ];
