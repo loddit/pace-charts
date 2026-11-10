@@ -1,18 +1,19 @@
 import type { WorldRecord, DistanceLabels } from './types';
 
-// World record data - stored as time strings
+// World record data - stored as time strings; ratified outdoor track and road records.
+// Verified against World Athletics on 2026-11-11.
 export const worldRecords: { male: WorldRecord[]; female: WorldRecord[] } = {
   male: [
     { distance: 100, name: 'Usain Bolt', year: 2009, time: '9.58' },
     { distance: 200, name: 'Usain Bolt', year: 2009, time: '19.19' },
     { distance: 400, name: 'Wayde van Niekerk', year: 2016, time: '43.03' },
     { distance: 800, name: 'David Rudisha', year: 2012, time: '1:40.91' },
-    { distance: 1000, name: 'Noah Ngeny', year: 1999, time: '2:11.96' },
+    { distance: 1000, name: 'Emmanuel Wanyonyi', year: 2026, time: '2:11.83' },
     { distance: 1500, name: 'Hicham El Guerrouj', year: 1998, time: '3:26.00' },
-    { distance: 3000, name: 'Daniel Komen', year: 1996, time: '7:20.67' },
+    { distance: 3000, name: 'Jakob Ingebrigtsen', year: 2024, time: '7:17.55' },
     { distance: 5000, name: 'Joshua Cheptegei', year: 2020, time: '12:35.36' },
     { distance: 10000, name: 'Joshua Cheptegei', year: 2020, time: '26:11.00' },
-    { distance: 21097.5, name: 'Jacob Kiplimo', year: 2025, time: '56:42' },
+    { distance: 21097.5, name: 'Yomif Kejelcha', year: 2026, time: '56:51' },
     { distance: 42195, name: 'Sabastian Sawe', year: 2026, time: '1:59:30' }
   ],
 
